@@ -59,7 +59,7 @@ export default function HomePage() {
           University account section
         </p>
         <h1 className="text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
-          Queue desk
+          Paloo
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-muted">
           A digital queue for the account section. People scan a code, take a
