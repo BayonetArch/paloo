@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * One dark surface, one accent, one alert colour.
+ *
+ * The palette is close to my portfolio: a near black page, slightly lifted
+ * cards, hairline borders, and a soft sage green as the only accent. Amber is
+ * reserved for the moment a turn is close, so colour always means something.
+ */
+@theme {
+  --color-page: #0b0c0e;
+  --color-surface: #131519;
+  --color-raised: #1a1d23;
+  --color-line: #272b33;
+  --color-ink: #f3f5f7;
+  --color-muted: #98a0ad;
+
+  --color-accent: #8fb99c;
+  --color-accent-bright: #b3d6bd;
+  --color-accent-deep: #14231b;
+  --color-accent-line: #33513f;
+
+  --color-warn: #e0a961;
+  --color-warn-bright: #f2cd96;
+  --color-warn-deep: #221b12;
+  --color-warn-line: #4b3a1d;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: var(--color-page);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-page);
+  color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background-color: var(--color-accent-line);
+  color: var(--color-ink);
+}
+
+/*
+ * A slow pulse on the bell while the turn is close. It stops on its own for
+ * anyone who has asked for reduced motion.
+ */
+@keyframes palo-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.88);
+  }
+}
+
+.animate-pulse-slow {
+  animation: palo-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-slow {
+    animation: none;
+  }
 }
