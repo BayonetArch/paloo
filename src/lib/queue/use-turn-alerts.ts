@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Watches a ticket and alerts the holder when the turn is close or arrives.
+ * Watches a ticket and alerts the holder as the turn comes closer.
  *
  * Each state change alerts once. The screen is held awake while someone waits,
  * since a phone that dims or locks is a phone that misses the call.
@@ -10,20 +10,25 @@
 import { useEffect, useRef } from "react";
 
 import { fireTurnAlert } from "./alerts";
-import { APPROACHING_POSITION, type TicketView } from "./types";
+import { APPROACHING_POSITION, PREPARE_POSITION, type TicketView } from "./types";
 import { acquireWakeLock, releaseWakeLock, watchVisibility } from "./wake-lock";
 
 /** What the page is showing, which is what alerts are driven from. */
-export type AlertPhase = "waiting" | "approaching" | "serving" | "closed";
+export type AlertPhase = "waiting" | "ready" | "approaching" | "serving" | "closed";
 
 /** Work out the phase from the ticket the store gave us. */
 export function alertPhase(ticket: TicketView | null): AlertPhase {
   if (!ticket) return "waiting";
   if (ticket.status === "completed" || ticket.status === "skipped") return "closed";
   if (ticket.status === "serving") return "serving";
-  if (ticket.position !== null && ticket.position <= APPROACHING_POSITION) return "approaching";
+  if (ticket.position === null) return "waiting";
+  if (ticket.position <= APPROACHING_POSITION) return "approaching";
+  if (ticket.position <= PREPARE_POSITION) return "ready";
   return "waiting";
 }
+
+/** The phases that make a noise. */
+const ALERTING: AlertPhase[] = ["ready", "approaching", "serving"];
 
 /** Fire the alerts for this ticket and keep the screen awake while it waits. */
 export function useTurnAlerts(ticket: TicketView | null): void {
@@ -39,8 +44,8 @@ export function useTurnAlerts(ticket: TicketView | null): void {
     if (phase === lastPhase.current) return;
 
     lastPhase.current = phase;
-    if (phase === "approaching" || phase === "serving") {
-      if (ticket) fireTurnAlert(phase, ticket);
+    if (ALERTING.includes(phase) && ticket) {
+      fireTurnAlert(phase as "ready" | "approaching" | "serving", ticket);
     }
   }, [phase, ticket]);
 

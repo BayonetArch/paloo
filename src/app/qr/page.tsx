@@ -22,7 +22,9 @@ export default function QrPage() {
         <h1 className="text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
           Join the queue for the account section
         </h1>
-        <p className="max-w-md text-lg text-muted">Scan this code with your phone to take a number.</p>
+        <p className="max-w-md text-lg text-muted">
+          Scan this code with your phone to take a number.
+        </p>
       </div>
 
       {url ? (

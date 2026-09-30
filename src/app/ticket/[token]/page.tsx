@@ -4,8 +4,8 @@
  * The page a student or parent keeps open while they wait.
  *
  * It reads the token from the route, asks the store about it, and hands the
- * answer to the panel. The demo controls sit underneath, collapsed, so the
- * ticket itself stays the only thing on screen.
+ * answer to the panel. The demo controls float at the top right, so the
+ * ticket itself stays the focus on screen.
  */
 
 import Link from "next/link";
@@ -34,9 +34,7 @@ export default function TicketPage(props: PageProps<"/ticket/[token]">) {
   return (
     <div className="bg-page">
       <TicketPanel ticket={ticket} />
-      <div className="mx-auto w-full max-w-lg px-5 pb-10">
-        <DemoPanel />
-      </div>
+      <DemoPanel />
     </div>
   );
 }
@@ -72,9 +70,7 @@ function UnknownTicket({ token }: { token: string }) {
         </Link>
       </div>
 
-      <div className="w-full max-w-md">
-        <DemoPanel />
-      </div>
+      <DemoPanel />
     </main>
   );
 }

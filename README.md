@@ -40,7 +40,7 @@ bunx tsc --noEmit
 | `/admin`           | The staff dashboard for the account desk                                 |
 | `/demo`            | Demo controls on their own page                                         |
 
-The demo controls also appear as a collapsible panel at the bottom of every
+The demo controls also appear as a floating panel at the top right of every
 ticket page.
 
 ## How the store works

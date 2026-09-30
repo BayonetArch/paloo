@@ -159,11 +159,13 @@ export const queueStore: QueueStore = {
 
 /** Read the queue outside React. Used by the demo driver. */
 export function readState(): QueueState {
+  reload();
   return queueStore.getState();
 }
 
 /** Move the queue on by one. Used by the dashboard, the demo panel and the driver. */
 export function advanceOnce(): void {
+  reload();
   queueStore.next();
 }
 
@@ -178,5 +180,14 @@ export function updateDemoSettings(patch: Partial<DemoSettings>): void {
   const unchanged =
     next.autoAdvance === state.demo.autoAdvance && next.intervalSeconds === state.demo.intervalSeconds;
   if (unchanged) return;
+  if (!next.autoAdvance) {
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("palo.driver.v1");
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+  }
   commit({ ...state, demo: next });
 }

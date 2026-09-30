@@ -61,7 +61,7 @@ export function createSeedState(at: number = 0): QueueState {
     tickets,
     lastIssued: SEED.lastWaitingNumber,
     recentServiceMs: [],
-    demo: { autoAdvance: false, intervalSeconds: 10 },
+    demo: { autoAdvance: false, intervalSeconds: 5 },
   };
 }
 
@@ -266,7 +266,7 @@ export function parseQueueState(raw: string | null, at: number = 0): QueueState 
     recentServiceMs: recentServiceMs.slice(-RECENT_SAMPLE_SIZE),
     demo: {
       autoAdvance: candidate.demo?.autoAdvance === true,
-      intervalSeconds: interval === 5 || interval === 10 || interval === 20 ? interval : seed.demo.intervalSeconds,
+      intervalSeconds: interval === 5 || interval === 10 || interval === 20 ? interval : 5,
     },
   };
 }

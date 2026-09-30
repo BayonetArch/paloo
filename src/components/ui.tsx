@@ -5,7 +5,7 @@
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export type ButtonTone = "primary" | "secondary" | "quiet" | "warn";
+export type ButtonTone = "primary" | "secondary" | "quiet" | "warn" | "danger";
 export type ButtonSize = "md" | "lg";
 
 const TONES: Record<ButtonTone, string> = {
@@ -14,6 +14,7 @@ const TONES: Record<ButtonTone, string> = {
   secondary: "bg-transparent text-ink ring-1 ring-line hover:bg-raised active:bg-line",
   quiet: "bg-transparent text-muted hover:bg-raised hover:text-ink",
   warn: "bg-transparent text-warn ring-1 ring-warn-line hover:bg-warn-deep",
+  danger: "bg-transparent text-danger ring-1 ring-danger-line hover:bg-danger-deep",
 };
 
 const SIZES: Record<ButtonSize, string> = {
@@ -26,7 +27,7 @@ const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visi
 
 export function buttonStyles(tone: ButtonTone = "primary", size: ButtonSize = "md", className = "") {
   return [
-    "inline-flex items-center justify-center gap-2.5 font-medium",
+    "inline-flex cursor-pointer items-center justify-center gap-2.5 font-medium",
     "transition-colors select-none",
     FOCUS,
     "disabled:pointer-events-none disabled:opacity-40",

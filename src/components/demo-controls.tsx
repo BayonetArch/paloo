@@ -8,9 +8,6 @@
  * and would never ship with a real account section.
  */
 
-import { useEffect } from "react";
-
-import { autoAdvanceTick } from "@/lib/queue/driver";
 import { advanceOnce, queueStore, updateDemoSettings } from "@/lib/queue/store";
 import { useQueueState } from "@/lib/queue/use-queue";
 import type { DemoSettings } from "@/lib/queue/types";
@@ -21,22 +18,8 @@ import { Button, Card } from "@/components/ui";
 
 const INTERVALS: DemoSettings["intervalSeconds"][] = [5, 10, 20];
 
-/**
- * Runs the timer that plays the part of staff. Any tab with auto advance on
- * ticks, and the store lease makes sure only one of them moves the queue.
- */
-function useAutoAdvance(enabled: boolean, intervalSeconds: number) {
-  useEffect(() => {
-    if (!enabled) return;
-
-    const id = window.setInterval(() => autoAdvanceTick(intervalSeconds), intervalSeconds * 1000);
-    return () => window.clearInterval(id);
-  }, [enabled, intervalSeconds]);
-}
-
 export function DemoControls() {
   const { demo, serving } = useQueueState();
-  useAutoAdvance(demo.autoAdvance, demo.intervalSeconds);
 
   return (
     <section className="flex flex-col gap-6" aria-labelledby="demo-controls-heading">
@@ -58,7 +41,7 @@ export function DemoControls() {
       </div>
 
       <Card className="flex flex-col gap-5 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <BoltIcon className="size-5 text-accent" />
             <span className="font-medium text-ink">Auto advance</span>
@@ -68,14 +51,16 @@ export function DemoControls() {
             type="button"
             role="switch"
             aria-checked={demo.autoAdvance}
+            aria-label={demo.autoAdvance ? "Turn off auto advance" : "Turn on auto advance"}
             onClick={() => updateDemoSettings({ autoAdvance: !demo.autoAdvance })}
-            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-              demo.autoAdvance ? "bg-accent" : "bg-line"
+            className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              demo.autoAdvance ? "bg-accent" : "bg-raised ring-1 ring-line hover:bg-line"
             }`}
           >
             <span
-              className={`absolute top-1 size-6 rounded-full bg-page transition-transform ${
-                demo.autoAdvance ? "translate-x-7" : "translate-x-1"
+              aria-hidden="true"
+              className={`inline-block size-6 rounded-full shadow-sm transition-transform duration-200 ease-in-out ${
+                demo.autoAdvance ? "translate-x-7 bg-page" : "translate-x-1 bg-muted"
               }`}
             />
             <span className="sr-only">{demo.autoAdvance ? "Auto advance on" : "Auto advance off"}</span>
@@ -90,7 +75,7 @@ export function DemoControls() {
               type="button"
               aria-pressed={demo.intervalSeconds === seconds}
               onClick={() => updateDemoSettings({ intervalSeconds: seconds })}
-              className={`min-h-12 min-w-20 rounded-xl px-4 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+              className={`min-h-12 min-w-20 cursor-pointer rounded-xl px-4 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                 demo.intervalSeconds === seconds
                   ? "bg-ink text-page"
                   : "bg-raised text-ink ring-1 ring-line hover:bg-line"

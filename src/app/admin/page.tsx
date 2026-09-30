@@ -57,7 +57,7 @@ export default function AdminPage() {
                 } ${state.recentServiceMs.length === 1 ? "service" : "services"}.`}
           </p>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
             <button
               type="button"
               onClick={() => queueStore.next()}
@@ -68,18 +68,26 @@ export default function AdminPage() {
               <ArrowRightIcon className="size-6" />
             </button>
 
-            <button
-              type="button"
-              onClick={() => queueStore.skip()}
+            <ConfirmButton
+              inline
+              size="lg"
+              tone="danger"
+              confirmTone="danger"
               disabled={!state.serving}
-              className={buttonStyles("warn", "lg", "text-xl")}
-            >
-              <SkipIcon className="size-6" />
-              Skip
-            </button>
+              label={
+                <>
+                  <SkipIcon className="size-6" />
+                  Skip
+                </>
+              }
+              confirmLabel={state.serving ? `Skip ${state.serving}` : "Skip"}
+              onConfirm={() => queueStore.skip()}
+            />
           </div>
 
-          <p className="text-sm text-muted">Skip moves a no show out of the queue and calls the next person.</p>
+          <p className="text-sm text-muted">
+            Skip is for no shows. It asks first, marks the token as skipped, and calls the next person.
+          </p>
 
           <ConfirmButton
             label="Reset queue"

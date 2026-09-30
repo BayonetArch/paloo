@@ -3,15 +3,16 @@
 /**
  * The ticket as the person waiting sees it.
  *
- * One panel covers every state of a ticket: waiting, approaching, serving and
- * finished. The token is the biggest thing on the page and the background
- * colour carries the news, so it reads at a glance from across a room.
+ * One panel covers every state of a ticket: waiting, ready, approaching,
+ * serving and finished. The token is the biggest thing on the page and the
+ * background colour carries the news, so it reads at a glance from across a
+ * room.
  */
 
 import { useRouter } from "next/navigation";
 
 import { queueStore } from "@/lib/queue/store";
-import { APPROACHING_POSITION, type TicketStatus, type TicketView } from "@/lib/queue/types";
+import { PREPARE_POSITION, type TicketStatus, type TicketView } from "@/lib/queue/types";
 import { alertPhase, type AlertPhase } from "@/lib/queue/use-turn-alerts";
 
 import { BellIcon, CheckIcon, ClockIcon, PeopleIcon } from "@/components/icons";
@@ -31,12 +32,16 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
   return (
     <div
       className={`flex min-h-dvh flex-col transition-colors duration-500 ${
-        serving ? "bg-accent-deep" : phase === "approaching" ? "bg-warn-deep" : "bg-page"
+        serving
+          ? "bg-accent-deep"
+          : phase === "approaching" || phase === "ready"
+            ? "bg-warn-deep"
+            : "bg-page"
       }`}
     >
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-7 px-5 py-8 sm:py-10">
         <header className="flex items-center gap-2.5">
-          <BellIcon className="size-5 text-accent" />
+          <BellIcon className={`size-5 ${phase === "ready" || phase === "approaching" ? "text-warn" : "text-accent"}`} />
           <p className="text-sm font-medium text-muted">Queue desk, account section</p>
         </header>
 
@@ -81,6 +86,7 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
 function Heading({ phase }: { phase: AlertPhase }) {
   if (phase === "serving") return <span className="text-accent-bright">It is your turn</span>;
   if (phase === "approaching") return <span className="text-warn-bright">Your turn is approaching</span>;
+  if (phase === "ready") return <span className="text-warn-bright">Get ready to move</span>;
   if (phase === "closed") return <>This ticket is finished</>;
   return <>Account section</>;
 }
@@ -105,6 +111,15 @@ function Message({
     );
   }
 
+  if (phase === "ready") {
+    return (
+      <>
+        You are currently <strong className="font-semibold text-warn-bright">#{position}</strong> in
+        line. Get ready to move to the account section.
+      </>
+    );
+  }
+
   if (phase === "closed" && status === "skipped") {
     return <>The desk passed your token while you were away. Join the queue again when you are ready.</>;
   }
@@ -115,24 +130,21 @@ function Message({
 }
 
 function TokenCard({ token, phase }: { token: string; phase: AlertPhase }) {
-  const ring =
-    phase === "serving"
-      ? "ring-1 ring-accent-line bg-accent-deep"
-      : phase === "approaching"
-        ? "ring-1 ring-warn-line bg-warn-deep"
-        : "ring-1 ring-line bg-surface";
+  const close = phase === "approaching" || phase === "ready";
 
-  const label = phase === "serving" ? "text-accent" : phase === "approaching" ? "text-warn" : "text-muted";
+  const ring = phase === "serving" ? "bg-accent-deep ring-1 ring-accent-line" : close ? "bg-warn-deep ring-1 ring-warn-line" : "bg-surface ring-1 ring-line";
+
+  const label = phase === "serving" ? "text-accent" : close ? "text-warn" : "text-muted";
 
   return (
     <div className={`flex flex-col items-center gap-3 rounded-2xl px-6 py-9 text-center ${ring}`}>
       <p className={`text-sm font-medium ${label}`}>Your token</p>
       <p className="font-mono text-7xl font-semibold tracking-tight text-ink sm:text-8xl">{token}</p>
 
-      {phase === "approaching" ? (
+      {close ? (
         <p className="mt-1 inline-flex items-center gap-2 rounded-full bg-warn-line/40 px-3.5 py-1.5 text-sm font-medium text-warn-bright">
           <BellIcon className="size-4 animate-pulse-slow" />
-          Please come back to the desk
+          {phase === "ready" ? "Get ready to move" : "Please come back to the desk"}
         </p>
       ) : null}
 
@@ -147,7 +159,7 @@ function TokenCard({ token, phase }: { token: string; phase: AlertPhase }) {
 }
 
 function Stats({ ticket }: { ticket: TicketView }) {
-  const approaching = ticket.position !== null && ticket.position <= APPROACHING_POSITION;
+  const close = ticket.position !== null && ticket.position <= PREPARE_POSITION;
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -165,9 +177,9 @@ function Stats({ ticket }: { ticket: TicketView }) {
         </p>
       </Card>
 
-      <p className={`col-span-2 text-sm ${approaching ? "text-warn" : "text-muted"}`}>
-        {approaching
-          ? "Your turn is close. Stay on this page."
+      <p className={`col-span-2 text-sm ${close ? "text-warn" : "text-muted"}`}>
+        {close
+          ? "Stay on this page, your turn is coming up."
           : ticket.estimateSource === "measured"
             ? "Estimated from the last few services at this desk."
             : "Estimated at 3 minutes for each person ahead of you."}

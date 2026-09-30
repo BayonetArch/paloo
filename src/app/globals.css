@@ -24,6 +24,12 @@
   --color-warn-bright: #f2cd96;
   --color-warn-deep: #221b12;
   --color-warn-line: #4b3a1d;
+
+  /* Reserved for the one action that throws someone out of the queue. */
+  --color-danger: #e2705f;
+  --color-danger-bright: #f0a094;
+  --color-danger-deep: #2a1614;
+  --color-danger-line: #5c2c27;
 }
 
 @theme inline {

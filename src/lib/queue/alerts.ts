@@ -1,18 +1,47 @@
 /**
  * Alerts for the person waiting.
  *
+ * There are three of them, and they get louder as the turn comes closer: get
+ * ready at five ahead, come back at three ahead, then your turn.
+ *
  * Every function reports whether the browser allowed it, so the ticket page
  * can be honest about what it did and what it could not do.
  */
 
 import type { TicketView } from "./types";
 
-export type AlertKind = "approaching" | "serving";
+export type AlertKind = "ready" | "approaching" | "serving";
 
 type Support = {
   vibrate: boolean;
   sound: boolean;
   notify: boolean;
+};
+
+type Recipe = {
+  /** Frequencies played in turn, in hertz. */
+  notes: number[];
+  /** Pause and buzz pattern handed to the vibration motor. */
+  pattern: number[];
+  title: string;
+};
+
+const RECIPES: Record<AlertKind, Recipe> = {
+  ready: {
+    notes: [587.33],
+    pattern: [80],
+    title: "Get ready, your turn is close at the account section",
+  },
+  approaching: {
+    notes: [659.25, 880],
+    pattern: [90, 60, 90],
+    title: "Your turn is close, return to the account section",
+  },
+  serving: {
+    notes: [880, 1174.66],
+    pattern: [140, 70, 140],
+    title: "It is your turn at the account section",
+  },
 };
 
 let audio: AudioContext | null = null;
@@ -44,8 +73,8 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   }
 }
 
-/** Two short notes. Approaching is a lower pair, your turn is brighter. */
-function playNotes(kind: AlertKind): boolean {
+/** Play the notes for this alert. Each kind gets its own short phrase. */
+function playNotes(notes: number[]): boolean {
   if (typeof window === "undefined") return false;
 
   try {
@@ -56,7 +85,6 @@ function playNotes(kind: AlertKind): boolean {
 
   if (audio.state === "suspended") void audio.resume();
 
-  const notes = kind === "serving" ? [880, 1174.66] : [659.25, 880];
   const start = audio.currentTime + 0.02;
 
   notes.forEach((frequency, index) => {
@@ -78,28 +106,37 @@ function playNotes(kind: AlertKind): boolean {
   return true;
 }
 
-function vibrate(kind: AlertKind): boolean {
+function vibrate(pattern: number[]): boolean {
   if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return false;
   try {
-    return navigator.vibrate(kind === "serving" ? [140, 70, 140] : [90, 60, 90]);
+    return navigator.vibrate(pattern);
   } catch {
     return false;
   }
+}
+
+function bodyFor(kind: AlertKind, ticket: TicketView): string {
+  if (kind === "serving") {
+    return `Token ${ticket.token}. Please go to the account desk.`;
+  }
+
+  if (kind === "ready") {
+    return `Token ${ticket.token}. You are number ${ticket.position}. Get ready to move to the account section.`;
+  }
+
+  return `Token ${ticket.token}. You are number ${ticket.position}. Please return to the account section.`;
 }
 
 function notify(kind: AlertKind, ticket: TicketView): boolean {
   if (typeof window === "undefined" || !("Notification" in window)) return false;
   if (Notification.permission !== "granted") return false;
 
-  const title = kind === "serving" ? "It is your turn at the account section" : "Your turn is close at the account section";
-  const body =
-    kind === "serving"
-      ? `Token ${ticket.token}. Please go to the account desk.`
-      : `Token ${ticket.token}. You are number ${ticket.position}. Please return to the account section.`;
-
   try {
     // The tag keeps one notification per token instead of a pile up.
-    const notification = new Notification(title, { body, tag: `palo-${ticket.token}` });
+    const notification = new Notification(RECIPES[kind].title, {
+      body: bodyFor(kind, ticket),
+      tag: `palo-${ticket.token}`,
+    });
     setTimeout(() => notification.close(), 15_000);
     return true;
   } catch {
@@ -109,9 +146,10 @@ function notify(kind: AlertKind, ticket: TicketView): boolean {
 
 /** Run every alert the browser allows for this change of state. */
 export function fireTurnAlert(kind: AlertKind, ticket: TicketView): Support {
+  const recipe = RECIPES[kind];
   return {
-    vibrate: vibrate(kind),
-    sound: playNotes(kind),
+    vibrate: vibrate(recipe.pattern),
+    sound: playNotes(recipe.notes),
     notify: notify(kind, ticket),
   };
 }

@@ -71,3 +71,6 @@ export const RECENT_SAMPLE_SIZE = 10;
 
 /** True once a ticket is close enough to the desk to warn the person. */
 export const APPROACHING_POSITION = 3;
+
+/** True once a ticket is close enough that the person should get ready to move. */
+export const PREPARE_POSITION = 5;
