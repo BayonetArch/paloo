@@ -58,7 +58,7 @@ function start(): void {
 
   // A first visit gets the seed queue, everyone else gets what was saved.
   const raw = window.localStorage.getItem(STORAGE_KEY);
-  state = parseQueueState(raw);
+  state = parseQueueState(raw, Date.now());
   lastRaw = raw === null ? serialise(state) : raw;
 
   if (lastRaw !== raw) write(state);
@@ -112,7 +112,7 @@ function reload(): void {
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (raw === lastRaw) return;
   lastRaw = raw;
-  commit(parseQueueState(raw));
+  commit(parseQueueState(raw, Date.now()));
 }
 
 export const queueStore: QueueStore = {
@@ -145,7 +145,7 @@ export const queueStore: QueueStore = {
 
   reset() {
     start();
-    commit(resetQueue());
+    commit(resetQueue(Date.now()));
   },
 
   subscribe(listener: () => void) {

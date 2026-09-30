@@ -20,31 +20,36 @@ export const SEED = {
   servingNumber: 119,
   firstWaitingNumber: 120,
   lastWaitingNumber: 137,
-  /** Fixed so the seed is identical on the server and in the browser. */
-  issuedAt: 0,
 };
 
-function makeTicket(number: number, status: Ticket["status"], issuedAt: number): Ticket {
+function makeTicket(number: number, status: Ticket["status"], at: number): Ticket {
   return {
     token: formatToken(number),
     number,
     status,
-    issuedAt,
-    calledAt: status === "waiting" ? null : issuedAt,
+    issuedAt: at,
+    calledAt: status === "waiting" ? null : at,
     finishedAt: null,
   };
 }
 
-/** The queue as it looks on a first visit: A-119 at the desk, A-120 to A-137 waiting. */
-export function createSeedState(): QueueState {
+/**
+ * The queue as it looks on a first visit: A-119 at the desk, A-120 to A-137
+ * waiting.
+ *
+ * The time defaults to zero so the server and the browser agree while a page
+ * renders. The store passes the current time in the browser, which keeps the
+ * first measured service honest.
+ */
+export function createSeedState(at: number = 0): QueueState {
   const tickets: Record<string, Ticket> = {};
 
-  const serving = makeTicket(SEED.servingNumber, "serving", SEED.issuedAt);
+  const serving = makeTicket(SEED.servingNumber, "serving", at);
   tickets[serving.token] = serving;
 
   const waiting: string[] = [];
   for (let number = SEED.firstWaitingNumber; number <= SEED.lastWaitingNumber; number += 1) {
-    const ticket = makeTicket(number, "waiting", SEED.issuedAt);
+    const ticket = makeTicket(number, "waiting", at);
     tickets[ticket.token] = ticket;
     waiting.push(ticket.token);
   }
@@ -146,8 +151,8 @@ export function skipTicket(state: QueueState, token: string | undefined, now: nu
 }
 
 /** Go back to the seed queue. Every token from before this point becomes unknown. */
-export function resetQueue(): QueueState {
-  return createSeedState();
+export function resetQueue(at: number = 0): QueueState {
+  return createSeedState(at);
 }
 
 /** People waiting, which is the number the dashboard reports. */
@@ -208,19 +213,19 @@ export function waitingTickets(state: QueueState): Ticket[] {
  * Repair anything loaded from localStorage. Returns the seed when the saved
  * data cannot be trusted, so a stale or hand edited value cannot break the app.
  */
-export function parseQueueState(raw: string | null): QueueState {
-  if (!raw) return createSeedState();
+export function parseQueueState(raw: string | null, at: number = 0): QueueState {
+  if (!raw) return createSeedState(at);
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
   } catch {
-    return createSeedState();
+    return createSeedState(at);
   }
 
-  if (typeof parsed !== "object" || parsed === null) return createSeedState();
+  if (typeof parsed !== "object" || parsed === null) return createSeedState(at);
 
-  const seed = createSeedState();
+  const seed = createSeedState(at);
   const candidate = parsed as Partial<QueueState>;
   if (candidate.version !== seed.version) return seed;
   if (typeof candidate.lastIssued !== "number") return seed;
