@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Queue desk",
+  title: "Paloo",
   description: "A digital queue for the university account section.",
 };
 
