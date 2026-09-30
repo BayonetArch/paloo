@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Paloo",
   description: "A digital queue for the university account section.",
+  // Once Paloo sits on the home screen it opens without browser chrome, which
+  // is the state iOS requires before it will show a notification at all.
+  appleWebApp: { capable: true, title: "Paloo", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {

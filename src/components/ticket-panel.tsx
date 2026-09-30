@@ -7,7 +7,7 @@ import { PREPARE_POSITION, type TicketStatus, type TicketView } from "@/lib/queu
 import { alertPhase, type AlertPhase } from "@/lib/queue/use-turn-alerts";
 
 import { BellIcon, CheckIcon, ClockIcon, PeopleIcon } from "@/components/icons";
-import { NotificationButton } from "@/components/notification-button";
+import { HomeScreenHint, NotificationPrompt, NotificationReminder } from "@/components/notification-prompt";
 import { buttonStyles, Card } from "@/components/ui";
 
 export function TicketPanel({ ticket }: { ticket: TicketView }) {
@@ -15,6 +15,9 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
   const phase = alertPhase(ticket);
   const finished = phase === "closed";
   const serving = phase === "serving";
+  // Once the desk is calling there is nothing left to arrange, and a closed
+  // ticket has no alert left to give.
+  const prompt = !finished && !serving;
 
   function joinAgain() {
     router.replace(`/ticket/${queueStore.join()}`);
@@ -46,6 +49,15 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
           </p>
         </div>
 
+        {/* Asked for on arrival, before the token, since the alert is what the
+            page is for and a person may leave the area straight away. */}
+        {prompt ? (
+          <>
+            <NotificationPrompt token={ticket.token} />
+            <HomeScreenHint />
+          </>
+        ) : null}
+
         <TokenCard token={ticket.token} phase={phase} />
 
         {!finished && !serving ? <Stats ticket={ticket} /> : null}
@@ -56,7 +68,7 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
           </button>
         ) : null}
 
-        <div className="mt-auto flex flex-col gap-7 pt-2">
+        <div className="mt-auto flex flex-col gap-4 pt-2">
           {!finished ? (
             <>
               <p className="flex items-start gap-3 text-base text-muted">
@@ -65,7 +77,7 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
                   ? "The desk is holding this spot for you."
                   : "Keep this page open. You can leave the area."}
               </p>
-              {!serving ? <NotificationButton /> : null}
+              {prompt ? <NotificationReminder /> : null}
             </>
           ) : null}
         </div>

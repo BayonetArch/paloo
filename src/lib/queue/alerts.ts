@@ -4,6 +4,7 @@
  * reports whether the browser allowed it, so the page can be honest about it.
  */
 
+import { showNotification } from "./service-worker";
 import type { TicketView } from "./types";
 
 export type AlertKind = "ready" | "approaching" | "serving";
@@ -52,6 +53,24 @@ export function alertSupport(): Support {
   };
 }
 
+/**
+ * Browsers hold sound back until the page has been touched, and an audio
+ * context built outside a tap stays suspended for good. So the first touch
+ * anywhere builds the context inside the gesture that unlocked it, and the
+ * notes play later without a prompt of their own.
+ */
+export function primeAudio(): boolean {
+  if (typeof window === "undefined") return false;
+
+  try {
+    audio ??= new AudioContext();
+    if (audio.state === "suspended") void audio.resume();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function notificationPermission(): NotificationPermission | "unsupported" {
   if (typeof window === "undefined" || !("Notification" in window)) return "unsupported";
   return Notification.permission;
@@ -67,16 +86,20 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   }
 }
 
+/** Guards the request that fires on arrival, so several readers ask only once. */
+let askedOnArrival = false;
+
+export async function requestNotificationPermissionOnce(): Promise<
+  NotificationPermission | "unsupported"
+> {
+  if (askedOnArrival) return notificationPermission();
+  askedOnArrival = true;
+  return requestNotificationPermission();
+}
+
 function playNotes(notes: number[]): boolean {
   if (typeof window === "undefined") return false;
-
-  try {
-    audio ??= new AudioContext();
-  } catch {
-    return false;
-  }
-
-  if (audio.state === "suspended") void audio.resume();
+  if (!primeAudio() || !audio) return false;
 
   const start = audio.currentTime + 0.02;
 
@@ -120,28 +143,41 @@ function bodyFor(kind: AlertKind, ticket: TicketView): string {
   return `Token ${ticket.token}. You are number ${ticket.position}. Please return to the account section.`;
 }
 
-function notify(kind: AlertKind, ticket: TicketView): boolean {
-  if (typeof window === "undefined" || !("Notification" in window)) return false;
-  if (Notification.permission !== "granted") return false;
+/**
+ * The banner at the top of the screen. This goes through the service worker
+ * rather than the Notification constructor, because on a phone the constructor
+ * is illegal and the worker is the only way to get a real notification.
+ */
+function notify(kind: AlertKind, ticket: TicketView): Promise<boolean> {
+  const recipe = RECIPES[kind];
 
-  try {
+  return showNotification(recipe.title, {
+    body: bodyFor(kind, ticket),
     // The tag keeps one notification per token instead of a pile up.
-    const notification = new Notification(RECIPES[kind].title, {
-      body: bodyFor(kind, ticket),
-      tag: `palo-${ticket.token}`,
-    });
-    setTimeout(() => notification.close(), 15_000);
-    return true;
-  } catch {
-    return false;
-  }
+    tag: `palo-${ticket.token}`,
+    // Tapping the banner should reopen the ticket it is about.
+    data: { url: `/ticket/${ticket.token}` },
+    vibrate: recipe.pattern,
+  });
 }
 
-export function fireTurnAlert(kind: AlertKind, ticket: TicketView): Support {
+export async function fireTurnAlert(kind: AlertKind, ticket: TicketView): Promise<Support> {
   const recipe = RECIPES[kind];
   return {
     vibrate: vibrate(recipe.pattern),
     sound: playNotes(recipe.notes),
-    notify: notify(kind, ticket),
+    notify: await notify(kind, ticket),
   };
+}
+
+/**
+ * Lets the holder see the banner once, before they are relying on it to catch
+ * their turn. It carries no sound, since the point is only the notification.
+ */
+export function sendTestNotification(token: string): Promise<boolean> {
+  return showNotification("Notifications are on", {
+    body: `Token ${token}. Your alert will look like this.`,
+    tag: `palo-test-${token}`,
+    data: { url: `/ticket/${token}` },
+  });
 }

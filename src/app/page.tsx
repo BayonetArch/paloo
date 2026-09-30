@@ -56,7 +56,7 @@ export default function HomePage() {
       <header className="flex flex-col gap-5">
         <p className="flex items-center gap-2 text-sm font-medium text-accent">
           <BellIcon className="size-4" />
-          University account section
+          BMC account section
         </p>
         <h1 className="text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
           Paloo

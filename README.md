@@ -17,3 +17,22 @@ CSS 4.
 bun install
 bun dev
 ```
+
+## Alerts
+
+The ticket page asks for notification permission on arrival and alerts at five
+ahead, at three ahead, and when the desk calls. Each alert fires as sound, a
+vibration, and a notification at the top of the screen.
+
+Notifications are raised through the service worker in `public/sw.js` rather
+than the `Notification` constructor, because the constructor is illegal on a
+phone and the worker is the only way to get a real banner there. The worker has
+no fetch handler on purpose, so it never intercepts a request or serves a stale
+page. `src/app/manifest.ts` makes the app installable, which is what iOS
+requires before it will show a notification at all, and the ticket page says so
+on an iPhone that is not yet installed.
+
+Browsers only allow their own permission prompt to come from a tap, so the
+request on arrival is a best effort and the "Allow notifications" card is the
+reliable path. Sound carries the same constraint, so the first touch anywhere
+on the page primes the audio.

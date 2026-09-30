@@ -8,7 +8,8 @@
 
 import { useEffect, useRef } from "react";
 
-import { fireTurnAlert } from "./alerts";
+import { fireTurnAlert, primeAudio } from "./alerts";
+import { registerAlertWorker } from "./service-worker";
 import { APPROACHING_POSITION, PREPARE_POSITION, type TicketView } from "./types";
 import { acquireWakeLock, releaseWakeLock, watchVisibility } from "./wake-lock";
 
@@ -40,9 +41,29 @@ export function useTurnAlerts(ticket: TicketView | null): void {
 
     lastPhase.current = phase;
     if (ALERTING.includes(phase) && ticket) {
-      fireTurnAlert(phase as "ready" | "approaching" | "serving", ticket);
+      void fireTurnAlert(phase as "ready" | "approaching" | "serving", ticket);
     }
   }, [phase, ticket]);
+
+  // A phone will not play a sound until the page has been touched, so the
+  // first tap anywhere primes the audio long before the turn is close.
+  useEffect(() => {
+    const prime = () => primeAudio();
+
+    window.addEventListener("pointerdown", prime, { once: true, capture: true });
+    window.addEventListener("keydown", prime, { once: true, capture: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", prime, { capture: true });
+      window.removeEventListener("keydown", prime);
+    };
+  }, []);
+
+  // The worker is what raises the banner, so it starts installing now rather
+  // than on the turn that needs it.
+  useEffect(() => {
+    registerAlertWorker();
+  }, []);
 
   const waiting = phase !== "closed";
 
