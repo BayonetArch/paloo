@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * A button that asks before it acts.
- *
- * Two shapes. Inline keeps the same spot and swaps the button for a confirm
- * and a cancel, which suits a desk action someone repeats all day. The card
- * spells out the consequences, which suits the actions that wipe state.
+ * A button that asks before it acts. Inline keeps the same spot and swaps the
+ * button for a confirm and a cancel, which suits a desk action someone repeats
+ * all day. The card spells out the consequences, which suits the actions that
+ * wipe state.
  */
 
 import { useState, type ReactNode } from "react";

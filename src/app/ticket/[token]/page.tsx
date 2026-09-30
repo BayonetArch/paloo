@@ -1,13 +1,5 @@
 "use client";
 
-/**
- * The page a student or parent keeps open while they wait.
- *
- * It reads the token from the route, asks the store about it, and hands the
- * answer to the panel. The demo controls float at the top right, so the
- * ticket itself stays the focus on screen.
- */
-
 import Link from "next/link";
 import { use } from "react";
 
@@ -47,10 +39,7 @@ function Loading() {
   );
 }
 
-/**
- * Shown for a token that was never issued, and for a token from before the
- * queue was reset. Both cases end the same way, with a way to join again.
- */
+/** Covers both a token that was never issued and one from before the queue was reset. */
 function UnknownTicket({ token }: { token: string }) {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-7 bg-page px-5 py-10">

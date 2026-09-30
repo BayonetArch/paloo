@@ -1,11 +1,6 @@
 "use client";
 
-/**
- * The staff dashboard for the account desk.
- *
- * Opening /admin is enough for the prototype. A real deployment would put a
- * staff login in front of it and check the session on the server.
- */
+/** Opening /admin is enough for the prototype. A real deployment would put a staff login in front of it. */
 
 import { nextUp, queueSize, serviceMinutes } from "@/lib/queue/core";
 import { queueStore } from "@/lib/queue/store";
@@ -15,7 +10,6 @@ import { ConfirmButton } from "@/components/confirm-button";
 import { ArrowRightIcon, PeopleIcon, SkipIcon } from "@/components/icons";
 import { buttonStyles, Card, Label } from "@/components/ui";
 
-/** How many tokens the Next list shows. */
 const NEXT_COUNT = 4;
 
 export default function AdminPage() {

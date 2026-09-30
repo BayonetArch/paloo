@@ -1,10 +1,6 @@
 "use client";
 
-/**
- * Asks for notification permission in a clear way. Browsers only allow the
- * request to come from a button press, so the prompt lives here rather than
- * firing on page load.
- */
+/** Browsers only allow the permission request to come from a button press, so the prompt lives here rather than firing on page load. */
 
 import { useReducer } from "react";
 

@@ -1,14 +1,5 @@
 "use client";
 
-/**
- * The ticket as the person waiting sees it.
- *
- * One panel covers every state of a ticket: waiting, ready, approaching,
- * serving and finished. The token is the biggest thing on the page and the
- * background colour carries the news, so it reads at a glance from across a
- * room.
- */
-
 import { useRouter } from "next/navigation";
 
 import { queueStore } from "@/lib/queue/store";

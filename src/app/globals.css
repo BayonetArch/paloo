@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
 /*
- * One dark surface, one accent, one alert colour.
- *
- * The palette is close to my portfolio: a near black page, slightly lifted
- * cards, hairline borders, and a soft sage green as the only accent. Amber is
- * reserved for the moment a turn is close, so colour always means something.
+ * One dark surface, one accent, one alert colour. Amber is reserved for the
+ * moment a turn is close, so colour always means something.
  */
 @theme {
   --color-page: #0b0c0e;
@@ -53,10 +50,7 @@ body {
   color: var(--color-ink);
 }
 
-/*
- * A slow pulse on the bell while the turn is close. It stops on its own for
- * anyone who has asked for reduced motion.
- */
+/* A slow pulse on the bell while the turn is close. */
 @keyframes palo-pulse {
   0%,
   100% {

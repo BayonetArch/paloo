@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * The demo controls in a floating panel at the top right, so a ticket page can carry
- * them without crowding the ticket itself.
- */
-
 import { useEffect, useState } from "react";
 
 import { DemoControls } from "@/components/demo-controls";

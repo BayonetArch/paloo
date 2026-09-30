@@ -1,6 +1,4 @@
-/**
- * Inline SVG icons, sized by the class name the caller passes in.
- */
+/** Inline SVG icons, sized by the class name the caller passes in. */
 
 type IconProps = {
   className?: string;

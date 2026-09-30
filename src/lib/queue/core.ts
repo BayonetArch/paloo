@@ -1,10 +1,4 @@
-/**
- * Pure queue logic.
- *
- * Every function here takes a state and returns a new state, or takes a state
- * and returns something to display. There is no browser API in this file, so
- * the same functions can run on a server later.
- */
+/** Pure queue logic: state in, state out. No browser APIs, so this can run on a server. */
 
 import {
   DEFAULT_SERVICE_MINUTES,
@@ -15,7 +9,6 @@ import {
 } from "./types";
 import { formatToken } from "./tokens";
 
-/** Seed values, chosen to match the mockups. */
 export const SEED = {
   servingNumber: 119,
   firstWaitingNumber: 120,
@@ -34,10 +27,7 @@ function makeTicket(number: number, status: Ticket["status"], at: number): Ticke
 }
 
 /**
- * The queue as it looks on a first visit: A-119 at the desk, A-120 to A-137
- * waiting.
- *
- * The time defaults to zero so the server and the browser agree while a page
+ * Time defaults to zero so the server and the browser agree while a page
  * renders. The store passes the current time in the browser, which keeps the
  * first measured service honest.
  */
@@ -70,7 +60,6 @@ function rememberService(state: QueueState, durationMs: number): number[] {
   return [...state.recentServiceMs, durationMs].slice(-RECENT_SAMPLE_SIZE);
 }
 
-/** Issue one token. Numbers carry on from the last one and are never reused. */
 export function issueTicket(state: QueueState, now: number): { state: QueueState; token: string } {
   const number = state.lastIssued + 1;
   const ticket = makeTicket(number, "waiting", now);
@@ -116,16 +105,11 @@ function finishServing(state: QueueState, now: number, status: Ticket["status"])
   return { ...state, serving: null, tickets: { ...state.tickets, [token]: finished }, recentServiceMs };
 }
 
-/**
- * Complete whoever is at the desk and call the next person. With an empty desk
- * the first waiting token is called straight away.
- */
 export function advanceQueue(state: QueueState, now: number): QueueState {
   const closed = state.serving ? finishServing(state, now, "completed") : state;
   return promoteFirstWaiting(closed, now);
 }
 
-/** Send a token to the back of nowhere. With no token, skips whoever is at the desk. */
 export function skipTicket(state: QueueState, token: string | undefined, now: number): QueueState {
   if (!token) {
     const released = state.serving ? finishServing(state, now, "skipped") : state;
@@ -150,17 +134,14 @@ export function skipTicket(state: QueueState, token: string | undefined, now: nu
   };
 }
 
-/** Go back to the seed queue. Every token from before this point becomes unknown. */
 export function resetQueue(at: number = 0): QueueState {
   return createSeedState(at);
 }
 
-/** People waiting, which is the number the dashboard reports. */
 export function queueSize(state: QueueState): number {
   return state.waiting.length;
 }
 
-/** The tokens on the way in, oldest first. */
 export function nextUp(state: QueueState, count: number): Ticket[] {
   return state.waiting.slice(0, count).map((token) => state.tickets[token]);
 }
@@ -173,7 +154,6 @@ export function positionOf(state: QueueState, token: string): number | null {
   return index + (state.serving ? 2 : 1);
 }
 
-/** Average minutes per person, from the recent services once any exist. */
 export function serviceMinutes(state: QueueState): { minutes: number; source: "default" | "measured" } {
   const sample = state.recentServiceMs;
   if (sample.length === 0) return { minutes: DEFAULT_SERVICE_MINUTES, source: "default" };
@@ -182,7 +162,6 @@ export function serviceMinutes(state: QueueState): { minutes: number; source: "d
   return { minutes: total / sample.length / 60_000, source: "measured" };
 }
 
-/** Add the numbers a ticket holder needs to the stored ticket. */
 export function deriveTicket(state: QueueState, token: string): TicketView | null {
   const ticket = state.tickets[token];
   if (!ticket) return null;
@@ -204,15 +183,11 @@ export function deriveTicket(state: QueueState, token: string): TicketView | nul
   };
 }
 
-/** Everyone currently in the queue, oldest first, for dashboard lists. */
 export function waitingTickets(state: QueueState): Ticket[] {
   return state.waiting.map((token) => state.tickets[token]);
 }
 
-/**
- * Repair anything loaded from localStorage. Returns the seed when the saved
- * data cannot be trusted, so a stale or hand edited value cannot break the app.
- */
+/** Returns the seed when the saved data cannot be trusted, so a stale or hand edited value cannot break the app. */
 export function parseQueueState(raw: string | null, at: number = 0): QueueState {
   if (!raw) return createSeedState(at);
 

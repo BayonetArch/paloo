@@ -1,11 +1,6 @@
 "use client";
 
-/**
- * React bindings for the queue store.
- *
- * useSyncExternalStore gives the store a stable snapshot, so any change in any
- * tab re-renders every component that reads the queue.
- */
+/** useSyncExternalStore gives the store a stable snapshot, so any change in any tab re-renders every reader. */
 
 import { useMemo, useSyncExternalStore } from "react";
 
@@ -20,7 +15,6 @@ function subscribe(listener: () => void) {
   return queueStore.subscribe(listener);
 }
 
-/** The whole queue. Re-renders on every change, from this tab or any other. */
 export function useQueueState(): QueueState {
   return useSyncExternalStore(
     subscribe,
@@ -29,7 +23,6 @@ export function useQueueState(): QueueState {
   );
 }
 
-/** One ticket with its position and estimate. Null when the token is unknown. */
 export function useTicket(token: string | null | undefined): TicketView | null {
   const state = useQueueState();
   return useMemo(() => (token ? deriveTicket(state, token) : null), [state, token]);

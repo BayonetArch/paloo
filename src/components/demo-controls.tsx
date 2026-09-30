@@ -1,11 +1,8 @@
 "use client";
 
 /**
- * Demo controls.
- *
- * These stand in for the person at the desk so one screen can show the whole
- * journey from waiting to approaching to serving. They belong to the prototype
- * and would never ship with a real account section.
+ * Demo controls. These stand in for the person at the desk so one screen can
+ * show the whole journey, and would never ship with a real account section.
  */
 
 import { advanceOnce, queueStore, updateDemoSettings } from "@/lib/queue/store";

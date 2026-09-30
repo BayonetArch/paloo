@@ -1,8 +1,7 @@
 /**
- * Screen wake lock, so a phone does not dim while someone waits.
- *
- * The browser drops the lock whenever the tab is hidden, so it is taken again
- * each time the page comes back to the front.
+ * Screen wake lock, so a phone does not dim while someone waits. The browser
+ * drops the lock whenever the tab is hidden, so it is taken again each time the
+ * page comes back to the front.
  */
 
 type Unlock = () => void;
@@ -10,12 +9,10 @@ type Unlock = () => void;
 let sentinel: WakeLockSentinel | null = null;
 let wanted = false;
 
-/** True when this browser can hold the screen awake. */
 export function wakeLockSupported(): boolean {
   return typeof navigator !== "undefined" && "wakeLock" in navigator;
 }
 
-/** True when a lock is held right now. */
 export function wakeLockHeld(): boolean {
   return sentinel !== null && !sentinel.released;
 }
@@ -39,12 +36,10 @@ export function releaseWakeLock(): void {
   void held.release().catch(() => undefined);
 }
 
-/** Take the lock again after the tab was hidden, if it was wanted. */
 export async function restoreWakeLock(): Promise<void> {
   if (wanted && !wakeLockHeld()) await acquireWakeLock();
 }
 
-/** Wire up the visibility handling. Returns a cleanup function. */
 export function watchVisibility(): Unlock {
   if (!wakeLockSupported()) return () => undefined;
 

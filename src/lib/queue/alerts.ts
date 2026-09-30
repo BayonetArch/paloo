@@ -1,11 +1,7 @@
 /**
- * Alerts for the person waiting.
- *
- * There are three of them, and they get louder as the turn comes closer: get
- * ready at five ahead, come back at three ahead, then your turn.
- *
- * Every function reports whether the browser allowed it, so the ticket page
- * can be honest about what it did and what it could not do.
+ * Alerts for the person waiting, getting louder as the turn comes closer: get
+ * ready at five ahead, come back at three ahead, then your turn. Every function
+ * reports whether the browser allowed it, so the page can be honest about it.
  */
 
 import type { TicketView } from "./types";
@@ -56,13 +52,11 @@ export function alertSupport(): Support {
   };
 }
 
-/** Notification permission: granted, denied or still to ask. */
 export function notificationPermission(): NotificationPermission | "unsupported" {
   if (typeof window === "undefined" || !("Notification" in window)) return "unsupported";
   return Notification.permission;
 }
 
-/** Ask for permission to show notifications. Resolves to the new permission. */
 export async function requestNotificationPermission(): Promise<NotificationPermission | "unsupported"> {
   if (typeof window === "undefined" || !("Notification" in window)) return "unsupported";
   if (Notification.permission !== "default") return Notification.permission;
@@ -73,7 +67,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   }
 }
 
-/** Play the notes for this alert. Each kind gets its own short phrase. */
 function playNotes(notes: number[]): boolean {
   if (typeof window === "undefined") return false;
 
@@ -144,7 +137,6 @@ function notify(kind: AlertKind, ticket: TicketView): boolean {
   }
 }
 
-/** Run every alert the browser allows for this change of state. */
 export function fireTurnAlert(kind: AlertKind, ticket: TicketView): Support {
   const recipe = RECIPES[kind];
   return {

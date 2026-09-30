@@ -5,10 +5,7 @@ import { useEffect } from "react";
 import { autoAdvanceTick } from "@/lib/queue/driver";
 import { useQueueState } from "@/lib/queue/use-queue";
 
-/**
- * Runs the auto-advance timer at the application root so that the queue
- * continues advancing even when the demo controls panel is collapsed or closed.
- */
+/** Runs the auto-advance timer at the application root so the queue keeps advancing even when the demo panel is closed. */
 export function AutoAdvanceDriver() {
   const { demo } = useQueueState();
   const enabled = demo.autoAdvance;

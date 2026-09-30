@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * The demo controls on their own page, for when the laptop is showing the
- * dashboard and the ticket needs driving from somewhere else.
- */
-
 import { queueSize } from "@/lib/queue/core";
 import { useQueueState } from "@/lib/queue/use-queue";
 

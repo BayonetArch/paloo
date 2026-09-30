@@ -1,9 +1,5 @@
 "use client";
 
-/**
- * A friendly last stop for anything that goes wrong on a page.
- */
-
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui";

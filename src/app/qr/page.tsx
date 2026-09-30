@@ -1,11 +1,6 @@
 "use client";
 
-/**
- * The poster for the account section.
- *
- * A phone camera pointed at this code opens the join page on whatever host the
- * app is running on, so the same screen works on a laptop and on a phone.
- */
+/** A phone camera pointed at this code opens the join page on whatever host the app is running on. */
 
 import { QRCodeSVG } from "qrcode.react";
 

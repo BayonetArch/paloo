@@ -1,10 +1,9 @@
 "use client";
 
 /**
- * Watches a ticket and alerts the holder as the turn comes closer.
- *
- * Each state change alerts once. The screen is held awake while someone waits,
- * since a phone that dims or locks is a phone that misses the call.
+ * Watches a ticket and alerts the holder as the turn comes closer. Each state
+ * change alerts once, and the screen is held awake while someone waits, since
+ * a phone that dims or locks is a phone that misses the call.
  */
 
 import { useEffect, useRef } from "react";
@@ -13,10 +12,8 @@ import { fireTurnAlert } from "./alerts";
 import { APPROACHING_POSITION, PREPARE_POSITION, type TicketView } from "./types";
 import { acquireWakeLock, releaseWakeLock, watchVisibility } from "./wake-lock";
 
-/** What the page is showing, which is what alerts are driven from. */
 export type AlertPhase = "waiting" | "ready" | "approaching" | "serving" | "closed";
 
-/** Work out the phase from the ticket the store gave us. */
 export function alertPhase(ticket: TicketView | null): AlertPhase {
   if (!ticket) return "waiting";
   if (ticket.status === "completed" || ticket.status === "skipped") return "closed";
@@ -27,10 +24,8 @@ export function alertPhase(ticket: TicketView | null): AlertPhase {
   return "waiting";
 }
 
-/** The phases that make a noise. */
 const ALERTING: AlertPhase[] = ["ready", "approaching", "serving"];
 
-/** Fire the alerts for this ticket and keep the screen awake while it waits. */
 export function useTurnAlerts(ticket: TicketView | null): void {
   const phase = alertPhase(ticket);
   const lastPhase = useRef<AlertPhase | null>(null);

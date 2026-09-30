@@ -1,15 +1,9 @@
-/**
- * Small shared pieces so spacing, touch targets and focus rings stay the same
- * across every page.
- */
-
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export type ButtonTone = "primary" | "secondary" | "quiet" | "warn" | "danger";
 export type ButtonSize = "md" | "lg";
 
 const TONES: Record<ButtonTone, string> = {
-  // Near white on near black, the way a primary action should read.
   primary: "bg-ink text-page hover:bg-white active:bg-muted",
   secondary: "bg-transparent text-ink ring-1 ring-line hover:bg-raised active:bg-line",
   quiet: "bg-transparent text-muted hover:bg-raised hover:text-ink",
@@ -65,7 +59,6 @@ export function Card({
   );
 }
 
-/** A small heading above a value, used across the ticket and the dashboard. */
 export function Label({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <p className={`text-sm font-medium text-muted ${className}`}>{children}</p>;
 }
