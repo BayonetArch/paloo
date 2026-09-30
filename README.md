@@ -1,4 +1,4 @@
-# Queue desk
+# Paloo
 
 A digital queue for a university account section. Students and parents scan a QR
 code, take a token, and leave the area with their page open. The page tracks

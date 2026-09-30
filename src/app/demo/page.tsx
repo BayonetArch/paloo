@@ -12,7 +12,7 @@ export default function DemoPage() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8 lg:gap-8 lg:py-10">
       <header className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-accent">Queue desk</p>
+        <p className="text-sm font-medium text-accent">Paloo</p>
         <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Demo controls</h1>
         <p className="max-w-2xl text-base leading-relaxed text-muted">
           These stand in for the person at the desk. Switch on auto advance to walk one ticket all

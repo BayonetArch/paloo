@@ -23,7 +23,7 @@ export default function AdminPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-8 lg:gap-8 lg:py-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium text-accent">Queue desk</p>
+          <p className="text-sm font-medium text-accent">Paloo</p>
           <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Account desk</h1>
         </div>
 
@@ -79,9 +79,6 @@ export default function AdminPage() {
             />
           </div>
 
-          <p className="text-sm text-muted">
-            Skip is for no shows. It asks first, marks the token as skipped, and calls the next person.
-          </p>
 
           <ConfirmButton
             label="Reset queue"

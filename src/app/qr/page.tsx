@@ -13,7 +13,7 @@ export default function QrPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-9 px-5 py-12">
       <div className="flex flex-col items-center gap-4 text-center">
-        <p className="text-sm font-medium text-accent">Queue desk</p>
+        <p className="text-sm font-medium text-accent">Paloo</p>
         <h1 className="text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
           Join the queue for the account section
         </h1>

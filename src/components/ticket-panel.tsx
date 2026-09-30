@@ -33,7 +33,7 @@ export function TicketPanel({ ticket }: { ticket: TicketView }) {
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-7 px-5 py-8 sm:py-10">
         <header className="flex items-center gap-2.5">
           <BellIcon className={`size-5 ${phase === "ready" || phase === "approaching" ? "text-warn" : "text-accent"}`} />
-          <p className="text-sm font-medium text-muted">Queue desk, account section</p>
+          <p className="text-sm font-medium text-muted">Paloo, account section</p>
         </header>
 
         {/* The live region announces the change as well as showing it. */}
