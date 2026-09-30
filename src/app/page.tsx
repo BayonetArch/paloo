@@ -46,7 +46,7 @@ const STEPS = [
   "A student or parent scans it and gets a token, such as A-127.",
   "The ticket page shows the token, how many people are ahead, and the wait.",
   "They leave the area with the page open on their phone.",
-  "The page alerts them at number 3, then again when the desk calls them.",
+  "The page beeps them at number 5 and again when the desk calls them.",
   "They walk back and are served at the account desk.",
 ];
 

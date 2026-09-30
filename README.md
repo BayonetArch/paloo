@@ -20,9 +20,13 @@ bun dev
 
 ## Alerts
 
-The ticket page asks for notification permission on arrival and alerts at five
-ahead, at three ahead, and when the desk calls. Each alert fires as sound, a
-vibration, and a notification at the top of the screen.
+The ticket page asks for notification permission on arrival. The holder is
+beeped and buzzed at five ahead, at three ahead, and when the desk calls, but
+only two of those raise a notification at the top of the screen: five ahead and
+the call itself. A browser counts the banners a site raises from the background
+and warns the holder that the site may be spam, so the middle of the queue is
+left audible rather than posted. Adding a kind to `BANNERS` in `alerts.ts` is
+all it takes to post that one too.
 
 Notifications are raised through the service worker in `public/sw.js` rather
 than the `Notification` constructor, because the constructor is illegal on a

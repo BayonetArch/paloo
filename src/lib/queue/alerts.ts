@@ -9,6 +9,9 @@ import type { TicketView } from "./types";
 
 export type AlertKind = "ready" | "approaching" | "serving";
 
+/** The kinds that raise a banner, as opposed to only making a sound. */
+type NotifyingKind = "ready" | "serving";
+
 type Support = {
   vibrate: boolean;
   sound: boolean;
@@ -20,25 +23,22 @@ type Recipe = {
   notes: number[];
   /** Pause and buzz pattern handed to the vibration motor. */
   pattern: number[];
-  title: string;
 };
 
 const RECIPES: Record<AlertKind, Recipe> = {
-  ready: {
-    notes: [587.33],
-    pattern: [80],
-    title: "Get ready, your turn is close at the account section",
-  },
-  approaching: {
-    notes: [659.25, 880],
-    pattern: [90, 60, 90],
-    title: "Your turn is close, return to the account section",
-  },
-  serving: {
-    notes: [880, 1174.66],
-    pattern: [140, 70, 140],
-    title: "It is your turn at the account section",
-  },
+  ready: { notes: [587.33], pattern: [80] },
+  approaching: { notes: [659.25, 880], pattern: [90, 60, 90] },
+  serving: { notes: [880, 1174.66], pattern: [140, 70, 140] },
+};
+
+/**
+ * The two moments worth interrupting for, and nothing in between. A browser
+ * counts the banners a site raises from the background and warns about it, so
+ * the middle of the queue is left audible rather than posted.
+ */
+const BANNERS: Record<NotifyingKind, string> = {
+  ready: "Get ready, your turn is close at the account section",
+  serving: "It is your turn at the account section",
 };
 
 let audio: AudioContext | null = null;
@@ -131,16 +131,17 @@ function vibrate(pattern: number[]): boolean {
   }
 }
 
-function bodyFor(kind: AlertKind, ticket: TicketView): string {
+function bodyFor(kind: NotifyingKind, ticket: TicketView): string {
   if (kind === "serving") {
     return `Token ${ticket.token}. Please go to the account desk.`;
   }
 
-  if (kind === "ready") {
-    return `Token ${ticket.token}. You are number ${ticket.position}. Get ready to move to the account section.`;
-  }
+  return `Token ${ticket.token}. You are number ${ticket.position}. Get ready to move to the account section.`;
+}
 
-  return `Token ${ticket.token}. You are number ${ticket.position}. Please return to the account section.`;
+/** True for the kinds that raise a banner, and narrows the kind for the caller. */
+function raisesBanner(kind: AlertKind): kind is NotifyingKind {
+  return kind in BANNERS;
 }
 
 /**
@@ -148,16 +149,14 @@ function bodyFor(kind: AlertKind, ticket: TicketView): string {
  * rather than the Notification constructor, because on a phone the constructor
  * is illegal and the worker is the only way to get a real notification.
  */
-function notify(kind: AlertKind, ticket: TicketView): Promise<boolean> {
-  const recipe = RECIPES[kind];
-
-  return showNotification(recipe.title, {
+function notify(kind: NotifyingKind, ticket: TicketView): Promise<boolean> {
+  return showNotification(BANNERS[kind], {
     body: bodyFor(kind, ticket),
     // The tag keeps one notification per token instead of a pile up.
     tag: `palo-${ticket.token}`,
     // Tapping the banner should reopen the ticket it is about.
     data: { url: `/ticket/${ticket.token}` },
-    vibrate: recipe.pattern,
+    vibrate: RECIPES[kind].pattern,
   });
 }
 
@@ -166,18 +165,20 @@ export async function fireTurnAlert(kind: AlertKind, ticket: TicketView): Promis
   return {
     vibrate: vibrate(recipe.pattern),
     sound: playNotes(recipe.notes),
-    notify: await notify(kind, ticket),
+    notify: raisesBanner(kind) ? await notify(kind, ticket) : false,
   };
 }
 
 /**
  * Lets the holder see the banner once, before they are relying on it to catch
- * their turn. It carries no sound, since the point is only the notification.
+ * their turn. It carries no sound, since the point is only the notification,
+ * and it shares the ticket's tag, so trying it never leaves a second banner
+ * sitting on the lock screen.
  */
 export function sendTestNotification(token: string): Promise<boolean> {
   return showNotification("Notifications are on", {
     body: `Token ${token}. Your alert will look like this.`,
-    tag: `palo-test-${token}`,
+    tag: `palo-${token}`,
     data: { url: `/ticket/${token}` },
   });
 }
