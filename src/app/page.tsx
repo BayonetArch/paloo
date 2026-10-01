@@ -128,19 +128,7 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <Card className="flex flex-col gap-4 p-6 sm:p-8">
-        <h2 className="text-xl font-semibold text-ink">Demo in one minute</h2>
-        <ol className="flex list-decimal flex-col gap-2 pl-5 text-base leading-relaxed text-muted">
-          <li>Open the QR code in the first window.</li>
-          <li>Open the account desk in a second window.</li>
-          <li>Join the queue from the QR code or the button above.</li>
-          <li>Switch on auto advance on the demo controls and pick a speed.</li>
-          <li>
-            Watch the ticket page change colour and alert as the turn comes
-            close.
-          </li>
-        </ol>
-      </Card>
+      
     </main>
   );
 }
