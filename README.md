@@ -12,6 +12,7 @@ browser, in localStorage, and is shared between tabs of the same browser.
 
 The project uses bun and Next.js 16 with the App Router, TypeScript and Tailwind
 CSS 4.
+To setup, run the following command:
 
 ```bash
 bun install
