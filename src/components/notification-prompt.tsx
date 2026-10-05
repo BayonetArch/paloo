@@ -6,7 +6,12 @@
  * request as well for the browsers that allow it without one.
  */
 
-import { useCallback, useEffect, useReducer, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  useSyncExternalStore,
+} from "react";
 
 import { askStore, type AskFlags } from "@/lib/ask-flags";
 import {
@@ -14,15 +19,22 @@ import {
   requestNotificationPermissionOnce,
   sendTestNotification,
 } from "@/lib/queue/alerts";
-import { useNeedsHomeScreen, useNotificationPermission } from "@/lib/use-browser";
+import {
+  useNeedsHomeScreen,
+  useNotificationPermission,
+} from "@/lib/use-browser";
 
-import { BellIcon, CheckIcon, CloseIcon } from "@/components/icons";
+import { BellIcon, CloseIcon } from "@/components/icons";
 import { Button, Card } from "@/components/ui";
 
 const SERVER_FLAGS: AskFlags = { notification: false, homeScreen: false };
 
 function useAskFlags(): AskFlags {
-  return useSyncExternalStore(askStore.subscribe, askStore.getFlags, () => SERVER_FLAGS);
+  return useSyncExternalStore(
+    askStore.subscribe,
+    askStore.getFlags,
+    () => SERVER_FLAGS,
+  );
 }
 
 /** The one place that holds the state the card, the reminder and the hint read. */
@@ -75,12 +87,15 @@ export function NotificationPrompt({ token }: { token: string }) {
         <div className="flex flex-1 flex-col gap-1">
           <p className="font-medium text-ink">Turn on notifications</p>
           <p className="text-sm leading-relaxed text-muted">
-            An alert drops in at the top of your screen when your turn is close, even if you have
-            stepped into another app.
+            An alert drops in at the top of your screen when your turn is close,
+            even if you have stepped into another app.
           </p>
         </div>
 
-        <CloseButton onClick={ask.dismiss} label="Dismiss the notification prompt" />
+        <CloseButton
+          onClick={ask.dismiss}
+          label="Dismiss the notification prompt"
+        />
       </div>
 
       <Button tone="primary" size="lg" className="w-full" onClick={ask.ask}>
@@ -92,7 +107,12 @@ export function NotificationPrompt({ token }: { token: string }) {
 }
 
 /** Once answered, the page says how it stands and lets the holder test it. */
-function NotificationStatus({ ask }: { ask: ReturnType<typeof useNotificationAsk> }) {
+function NotificationStatus({}: {
+  ask: ReturnType<typeof useNotificationAsk>;
+}) {
+  return <></>;
+
+  /* Only for tests...
   if (ask.permission === "denied") {
     return (
       <Card className="flex flex-col gap-2 p-5">
@@ -101,8 +121,8 @@ function NotificationStatus({ ask }: { ask: ReturnType<typeof useNotificationAsk
           Notifications are blocked
         </p>
         <p className="text-sm leading-relaxed text-muted">
-          Open the site settings for this page and allow notifications to get the alert. The alert
-          on this page still works either way.
+          Open the site settings for this page and allow notifications to get
+          the alert. The alert on this page still works either way.
         </p>
       </Card>
     );
@@ -124,6 +144,7 @@ function NotificationStatus({ ask }: { ask: ReturnType<typeof useNotificationAsk
       </Button>
     </Card>
   );
+*/
 }
 
 /** The quiet way back in, for anyone who put the card away without answering. */
@@ -157,9 +178,12 @@ export function HomeScreenHint() {
   return (
     <Card className="flex items-start gap-3 p-5">
       <div className="flex flex-1 flex-col gap-1">
-        <p className="text-sm font-medium text-ink">Add Paloo to your Home Screen</p>
+        <p className="text-sm font-medium text-ink">
+          Add Paloo to your Home Screen
+        </p>
         <p className="text-sm leading-relaxed text-muted">
-          Tap Share, then Add to Home Screen. iPhone only shows the alert once Paloo is installed.
+          Tap Share, then Add to Home Screen. iPhone only shows the alert once
+          Paloo is installed.
         </p>
       </div>
 
@@ -171,7 +195,13 @@ export function HomeScreenHint() {
   );
 }
 
-function CloseButton({ onClick, label }: { onClick: () => void; label: string }) {
+function CloseButton({
+  onClick,
+  label,
+}: {
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
